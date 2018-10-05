@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { DataService } from '../services/data.service';
+
 import * as d3 from "d3";
 
 @Component({
@@ -6,12 +8,19 @@ import * as d3 from "d3";
   templateUrl: './visualizer.component.html',
   styleUrls: ['./visualizer.component.scss']
 })
-export class VisualizerComponent implements OnInit {
+export class VisualizerComponent implements OnInit, OnChanges {
+  @Input() selectedFile: string;
+  @Input() runVisualization: boolean;
 
-  constructor() { }
+  constructor(private dataService: DataService) { }
 
-  ngOnInit() {
-    console.log(d3);
+  ngOnInit() { }
+
+  ngOnChanges() {
+    if (this.runVisualization) this.visualize();
   }
 
+  visualize() {
+    this.dataService.getTrainingResult(this.selectedFile);
+  }
 }

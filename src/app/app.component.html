@@ -1,3 +1,31 @@
-<app-visualizer></app-visualizer>
+<mat-toolbar color="primary">
+    <button mat-icon-button (click)="snav.toggle()">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <h1 class="app-name">MLP Activities Visualizer</h1>
+</mat-toolbar>
+
+<mat-sidenav-container>
+    <mat-sidenav #snav [mode]="'over'" [fixedInViewport]="true" [fixedTopGap]="toolbarHeight">
+        <form (ngSubmit)="snav.close(); visualize()" #vizForm="ngForm">
+            <mat-form-field>
+                <mat-select placeholder="File to visualize" name="selectFile" required [(ngModel)]="selectedFile" #selectFile="ngModel">
+                    <mat-option *ngFor="let file of files" [value]="file.value">
+                        {{ file.viewValue }}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="selectFile.invalid">Please choose a file</mat-error>
+            </mat-form-field>
+            <div class="action">
+                <button mat-button color="primary" [disabled]="!vizForm.form.valid">Visualize</button>
+            </div>
+        </form>
+    </mat-sidenav>
+
+    <mat-sidenav-content [style.paddingTop.px]="toolbarHeight">
+        <app-visualizer [selectedFile]="selectedFile" [runVisualization]="runVisualization"></app-visualizer>
+    </mat-sidenav-content>
+</mat-sidenav-container>
+
 
 <!-- <router-outlet></router-outlet> -->
