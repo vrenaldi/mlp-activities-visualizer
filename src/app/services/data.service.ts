@@ -15,7 +15,7 @@ export class DataService {
     this.toolbarHeight = new BehaviorSubject(56);
   }
 
-  getTrainingResult(filename: string) {
+  getTrainingResults(filename: string) {
     return this.http.get(this.basePath + filename);
   }
 }

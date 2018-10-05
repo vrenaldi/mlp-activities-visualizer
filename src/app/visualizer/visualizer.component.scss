@@ -2,3 +2,11 @@
     box-sizing: border-box;
     height: 100vh;
 }
+
+.information {
+    position: fixed;    
+    bottom: 0;
+    width: 100vw;
+    text-align: center;
+    padding-bottom: 1rem;
+}

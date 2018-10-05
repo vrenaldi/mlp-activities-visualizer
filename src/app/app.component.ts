@@ -36,7 +36,8 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe(toolbarHeight => { this.toolbarHeight = toolbarHeight; });
 
     this.files = [
-      { value: "MLP[10, 10].json", viewValue: "MLP[10, 10]" }
+      { value: "MLP[10, 10].json", viewValue: "MLP[10, 10]" },
+      { value: "MLP[20, 15, 10].json", viewValue: "MLP[20, 15, 10]" }
     ];
   }
 
