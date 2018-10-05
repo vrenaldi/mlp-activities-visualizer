@@ -16,6 +16,6 @@ export class DataService {
   }
 
   getTrainingResult(filename: string) {
-    this.http.get(this.basePath + filename).subscribe(res => console.log(res));
+    return this.http.get(this.basePath + filename);
   }
 }
