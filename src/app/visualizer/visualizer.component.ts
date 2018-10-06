@@ -16,7 +16,9 @@ export class VisualizerComponent implements OnChanges, OnInit {
   toolbarHeight: number;
   unsubscribe: Subject<any> = new Subject();
 
+  zoom;
   svg; svgWidth; svgHeight;
+  vizContainer;
 
   topology; weights;
   layerSpacing; nodeRadius;
@@ -26,21 +28,21 @@ export class VisualizerComponent implements OnChanges, OnInit {
 
   @ViewChild("container") container;
   @Input() vizOptions;
+  @Output() endofVisualization: EventEmitter<boolean>;
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     // TO BE IMPLEMENTED
-    // this.svgWidth = window.innerWidth / 1.5;
-    // this.svgHeight = window.innerHeight / 1.5;
-    // this.redraw();
   }
 
-  constructor(private dataService: DataService) { }
+  constructor(private dataService: DataService) {
+    this.endofVisualization = new EventEmitter<boolean>();
+  }
 
   ngOnChanges() {
     if (this.vizOptions) {
+      this.resetViz();
       if (this.vizOptions.isRunning) this.visualize();
-      else this.resetViz();
     }
   }
 
@@ -58,8 +60,6 @@ export class VisualizerComponent implements OnChanges, OnInit {
   visualize() {
     this.dataService.getTrainingResults(this.vizOptions.selectedFile).pipe(takeUntil(this.unsubscribe))
       .subscribe(trainingResults => {
-        this.resetViz();
-
         this.setupTopology();
         this.setupWeights(trainingResults);
 
@@ -158,17 +158,20 @@ export class VisualizerComponent implements OnChanges, OnInit {
           this.bindWeights(i);
           this.bindTopology(i);
 
+          this.currEpoch = `Epoch ${i + 1}`;
+
+          if (i == this.weights.length - 1) this.endofVisualization.emit(true);
         }, 1500 * i));
       }
     }
     else {
-      this.resetViz();
-      console.log("Something is wrong with the calculation. Please try again.");
+      this.currEpoch = "Something is wrong with the calculation. Please try again.";
+      this.endofVisualization.emit(true);
     }
   }
 
   bindWeights(currEpoch: number) {
-    const line = this.svg.selectAll('line')
+    const line = this.vizContainer.selectAll('line')
       .data(this.weights[currEpoch]);
 
     const self = this;
@@ -207,7 +210,7 @@ export class VisualizerComponent implements OnChanges, OnInit {
   }
 
   bindTopology(currEpoch: number) {
-    const circles = this.svg.selectAll('circle')
+    const circles = this.vizContainer.selectAll('circle')
       .data(this.topology);
 
     const self = this;
@@ -290,16 +293,6 @@ export class VisualizerComponent implements OnChanges, OnInit {
     return color;
   }
 
-  updateWeightsDifferences(layerIndex: number, sourceIndex: number, diff: number) {
-    if (sourceIndex === 0) {
-      this.minMaxDiffs[layerIndex].minDiff = diff;
-      this.minMaxDiffs[layerIndex].maxDiff = diff;
-    } else {
-      if (diff < this.minMaxDiffs[layerIndex].minDiff) { this.minMaxDiffs[layerIndex].minDiff = diff; }
-      if (diff > this.minMaxDiffs[layerIndex].maxDiff) { this.minMaxDiffs[layerIndex].maxDiff = diff; }
-    }
-  }
-
   resetViz() {
     if (this.runningAnimation) this.runningAnimation.forEach(element => { clearTimeout(element); });
     this.runningAnimation = [];
@@ -309,13 +302,15 @@ export class VisualizerComponent implements OnChanges, OnInit {
       .append('svg')
       .attr('width', window.innerWidth / 1.5)
       .attr('height', window.innerHeight / 1.5);
+    this.vizContainer = this.svg.append("g");
 
     this.currEpoch = "";
-  }
 
-  redraw() {
-    this.svg
-      .attr('width', this.svgWidth)
-      .attr('height', this.svgHeight);
+
+    const self = this;
+    this.zoom = d3.zoom()
+      .scaleExtent([1, 10])
+      .on("zoom", () => { self.vizContainer.attr("transform", d3.event.transform); });
+    this.svg.call(this.zoom);
   }
 }

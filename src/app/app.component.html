@@ -24,7 +24,7 @@
     </mat-sidenav>
 
     <mat-sidenav-content>
-        <app-visualizer [vizOptions]="vizOptions"></app-visualizer>
+        <app-visualizer [vizOptions]="vizOptions" (endofVisualization)="isRunning=false"></app-visualizer>
     </mat-sidenav-content>
 </mat-sidenav-container>
 
