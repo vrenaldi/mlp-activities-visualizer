@@ -16,7 +16,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   files: File[];
   selectedFile: string;
-  runVisualization: boolean;
+  isRunning: boolean;
+
+  vizOptions;
 
   unsubscribe: Subject<any> = new Subject();
 
@@ -36,12 +38,27 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe(toolbarHeight => { this.toolbarHeight = toolbarHeight; });
 
     this.files = [
-      { value: "MLP[10, 10].json", viewValue: "MLP[10, 10]" },
-      { value: "MLP[20, 15, 10].json", viewValue: "MLP[20, 15, 10]" }
+      { value: "MLP[10,10].json", viewValue: "MLP[10, 10]" },
+      { value: "MLP[20,15,10].json", viewValue: "MLP[20, 15, 10]" }
     ];
   }
 
-  visualize() { this.runVisualization = true; }
+  visualize() {
+    this.isRunning = true;
+    this.updateVizOptions();
+  }
+
+  stopViz() {
+    this.isRunning = false;
+    this.updateVizOptions();
+  }
+
+  updateVizOptions() {
+    this.vizOptions = {
+      selectedFile: this.selectedFile,
+      isRunning: this.isRunning
+    };
+  }
 
   ngOnDestroy() {
     this.unsubscribe.next();

@@ -7,7 +7,7 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class DataService {
-  readonly basePath = "/assets/";
+  readonly basePath = "./assets/";
 
   toolbarHeight: BehaviorSubject<number>;
 
